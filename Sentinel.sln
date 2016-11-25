@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{7B71DFEC-5C8D-D524-069E-ED634DC0A3A5}") = "Sentinel", "Assembly-CSharp.csproj", "{4F91BE27-5A0F-30FD-A0BB-EB4103B902FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F91BE27-5A0F-30FD-A0BB-EB4103B902FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F91BE27-5A0F-30FD-A0BB-EB4103B902FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F91BE27-5A0F-30FD-A0BB-EB4103B902FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F91BE27-5A0F-30FD-A0BB-EB4103B902FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
