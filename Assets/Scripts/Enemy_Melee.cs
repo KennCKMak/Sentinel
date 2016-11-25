@@ -102,27 +102,20 @@ public class Enemy_Melee : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D col){
 		if (col.tag == "Player_Projectile") {
 			health = health - col.GetComponent<Player_Projectile> ().wpnDmg;
-			GameObject newProp = Instantiate (col.GetComponent<Player_Projectile> ().arrowProp,
-				col.transform.position, col.transform.rotation) as GameObject;
-			newProp.transform.parent = transform;
-			Destroy (col.gameObject);
-			updateHP ();
-			//if ded
-		}
-		if (col.tag == "Ally_Projectile") {
-			health = health - col.GetComponent<Ally_Projectile> ().wpnDmg;
-			GameObject newProp = Instantiate (col.GetComponent<Ally_Projectile> ().arrowProp,
-				col.transform.position, col.transform.rotation) as GameObject;
-			newProp.transform.parent = transform;
-			Destroy (col.gameObject);
+			if (col.GetComponent<Player_Projectile> ().punchthrough >= 1) {
+				col.GetComponent<Player_Projectile> ().punchthrough--;
+			} else if (col.GetComponent<Player_Projectile> ().punchthrough < 1) {
+				GameObject newProp = Instantiate (col.GetComponent<Player_Projectile> ().arrowProp,
+					col.transform.position, col.transform.rotation) as GameObject;
+				newProp.transform.parent = transform;
+				col.GetComponent<Player_Projectile> ().punchthrough--;
+				Destroy (col.gameObject);
+			}
 			updateHP ();
 			//if ded
 		}
 	}
 
-	void spawnHPBar(){
-
-	}
 
 	void updateHP(){
 		float percentage = health / maxHealth;

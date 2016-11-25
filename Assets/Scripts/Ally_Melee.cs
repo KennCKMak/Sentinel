@@ -17,6 +17,7 @@ public class Ally_Melee : MonoBehaviour {
 
 
 	private bool alive;
+	private int indexLoc; //its position in the gameMaster array 
 
 	public GameObject target;
 	public float range;
@@ -28,9 +29,8 @@ public class Ally_Melee : MonoBehaviour {
 	private float elapsedTime; //how long since it last attacked
 
 
-	private GameObject idleImg;
-	private GameObject fireImg;
-	private Quaternion targetRot = new Quaternion (0, 0, 0, 1);
+	//private GameObject idleImg;
+	private Quaternion defaultRot = new Quaternion (0, 0, 0, 1);
 
 
 	// Use this for initialization
@@ -42,7 +42,7 @@ public class Ally_Melee : MonoBehaviour {
 		HealthBar.GetComponent<healthBarTarget> ().target = HealthBarLocation;
 		HPImg = HealthBar.transform.FindChild ("HPImg").transform;
 
-		idleImg = transform.FindChild ("IdleImg").gameObject;
+		//idleImg = transform.FindChild ("IdleImg").gameObject;
 		//fireImg = transform.FindChild ("FireImg").gameObject;
 		alive = true;
 
@@ -54,32 +54,32 @@ public class Ally_Melee : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (alive){
-			if (searchTime > 2) {
-				GetTarget ();
-			}
-			searchTime += Time.deltaTime;
+			
+			GetTarget ();
+
 			if (target != null) {
 				Vector3 dir = target.transform.position - transform.position;
 				if (dir.magnitude < range) { //if within range
-					//float angle = Mathf.Atan2 (dir.y, dir.x) * Mathf.Rad2Deg + 180;
-					//transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
-					targetRot = Quaternion.FromToRotation (transform.position, -dir);
+					float angle = Mathf.Atan2 (dir.y, dir.x) * Mathf.Rad2Deg + 180;
+					Quaternion newRotation = Quaternion.AngleAxis (angle, Vector3.forward);
+					transform.rotation = Quaternion.Lerp (transform.rotation, newRotation, 15 * Time.deltaTime);
 					inCombat = true;
 				} else { //not in range
 					inCombat = false;
-					targetRot = new Quaternion (0, 0, 0, 1);
+					transform.rotation = Quaternion.Lerp (transform.rotation, defaultRot, Time.deltaTime);
 				}
 				if (inCombat && target != null)
 					Fight ();
 				else
 					elapsedTime = 0;
+			} else { //if no targe
+				GetTarget ();
 			}
-			transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime);
 		}
 	}
 
 	void GetTarget(){
-		if (searchTime > 2) {
+		if (searchTime > 1) {   //check for new target every 1 seconds
 			for (int i = 0; i < gameMaster.EnemyList.Count; i++) {
 				if (target == null)
 					target = gameMaster.EnemyList [i].gameObject;
@@ -91,9 +91,9 @@ public class Ally_Melee : MonoBehaviour {
 					}
 				}
 			}
-
+			searchTime = 0;
 		}
-		searchTime = 0;
+		searchTime += Time.deltaTime;
 	}
 
 
@@ -134,6 +134,7 @@ public class Ally_Melee : MonoBehaviour {
 			transform.tag = "Untagged";
 			Destroy (gameObject, 1f);
 			gameMaster.spearmanCount--;
+			gameMaster.Spears [indexLoc] = null;
 			gameMaster.refreshAllyList ();
 		}
 	}
@@ -144,6 +145,9 @@ public class Ally_Melee : MonoBehaviour {
 	}
 	public bool isAlive(){
 		return alive;
+	}
+	public void setIndexLoc(int n){
+		indexLoc = n;
 	}
 
 
@@ -161,6 +165,4 @@ public class Ally_Melee : MonoBehaviour {
 		}
 		elapsedTime += Time.deltaTime;
 	}
-
-
 }

@@ -61,19 +61,28 @@ public class Player : MonoBehaviour {
 		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
 		mousePosition.z = 0;
 		Quaternion rot = Quaternion.LookRotation(arrowBase.transform.position - mousePosition, Vector3.forward);
-		GameObject testArr = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
-		testArr.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z-89.1f);
-		testArr.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg;
+		GameObject newArrow = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
+		newArrow.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z-89.1f);
+		newArrow.tag = "Player_Projectile";
+		newArrow.GetComponent<Player_Projectile> ();
+		newArrow.GetComponent<Player_Projectile> ().speed = 10f;
+		newArrow.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg;
 	}
 
 	void FireArrow(float angle){ //this is used to offset things
 		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
 		mousePosition.z = 0;
 		Quaternion rot = Quaternion.LookRotation(arrowBase.transform.position - mousePosition, Vector3.forward);
-		GameObject testArr = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
-		testArr.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z-89.1f+angle);
-		testArr.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg;
+		GameObject newArrow = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
+		newArrow.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z-89.1f+angle);
+		newArrow.tag = "Player_Projectile";
+		newArrow.GetComponent<Player_Projectile> ();
+		newArrow.GetComponent<Player_Projectile> ().speed = 10f;
+		newArrow.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg;
 	}
+
+
+
 
 	void FireScatterArrow(int num){
 		if (num == 0 || num == 1)

@@ -16,6 +16,7 @@ public class Ally_Ranged : MonoBehaviour {
 
 
 	private bool alive;
+	private int indexLoc; //its position in the gameMaster array 
 
 	public GameObject target;
 	public float range;
@@ -23,15 +24,14 @@ public class Ally_Ranged : MonoBehaviour {
 	public float wpnSpeed;
 	public bool inCombat = false;
 
+	public GameObject arrowPrefab;
 	private GameObject idleImg;
 	private GameObject fireImg;
 	private GameObject arrowSpawn;
-	private Quaternion targetRot = new Quaternion (0, 0, 0, 1);
+	private Quaternion defaultRot = new Quaternion (0, 0, 0, 1);
 
 	private float searchTime; //how long before it checks again for a target
 	private float elapsedTime; //how long since it last attacked
-
-	public GameObject arrowPrefab;
 
 
 	// Use this for initialization
@@ -54,33 +54,34 @@ public class Ally_Ranged : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (alive){
-			if (searchTime > 2) {
-				GetTarget ();
-			}
-			searchTime += Time.deltaTime;
-			if (target != null) {
+		if (alive) {
+
+			GetTarget ();
+
+			if (target != null) { //if I have a target...
 				Vector3 dir = target.transform.position - transform.position;
 				if (dir.magnitude < range) { //if within range
 					float angle = Mathf.Atan2 (dir.y, dir.x) * Mathf.Rad2Deg + 180;
-					transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
-					//targetRot = Quaternion.FromToRotation (transform.position, -dir);
+					Quaternion newRotation = Quaternion.AngleAxis (angle, Vector3.forward);
+					transform.rotation = Quaternion.Lerp (transform.rotation, newRotation, 15 * Time.deltaTime);
 					inCombat = true;
 				} else { //not in range
 					inCombat = false;
-					//targetRot = new Quaternion (0, 0, 0, 1);
+					transform.rotation = Quaternion.Lerp (transform.rotation, defaultRot, Time.deltaTime);
 				}
 				if (inCombat && target != null)
 					Fire ();
 				else
 					elapsedTime = 0;
+			} else {
+				GetTarget ();
 			}
-			transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime);
 		}
+		
 	}
 
 	void GetTarget(){
-		if (searchTime > 2) {
+		if (searchTime > 1) {   //check for new target every 1 seconds
 			for (int i = 0; i < gameMaster.EnemyList.Count; i++) {
 				if (target == null)
 					target = gameMaster.EnemyList [i].gameObject;
@@ -92,20 +93,24 @@ public class Ally_Ranged : MonoBehaviour {
 					}
 				}
 			}
-
+			searchTime = 0;
 		}
-		searchTime = 0;
+		searchTime += Time.deltaTime;
 	}
+
 
 	void Fire() {
 
-		if (elapsedTime > wpnSpeed){
+		if (elapsedTime > wpnSpeed + Random.value*0.5f){
 			GameObject newArrow = Instantiate (arrowPrefab, arrowSpawn.transform.position, arrowSpawn.transform.rotation) as GameObject;
 			newArrow.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z+90.9f);
-			newArrow.GetComponent<Ally_Projectile> ().wpnDmg = wpnDmg;
+			newArrow.tag = "Player_Projectile";
+			newArrow.AddComponent<Player_Projectile> ();
+			newArrow.GetComponent<Player_Projectile> ().speed = 10f;
+			newArrow.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg;
 			elapsedTime = 0;
 		}
-		elapsedTime += Time.deltaTime * Random.value;
+		elapsedTime += Time.deltaTime;
 	}
 
 
@@ -144,6 +149,7 @@ public class Ally_Ranged : MonoBehaviour {
 			transform.tag = "Untagged";
 			Destroy (gameObject, 1f);
 			gameMaster.archerCount--;
+			gameMaster.Archers [indexLoc] = null;
 			gameMaster.refreshAllyList ();
 		}
 	}
@@ -156,5 +162,7 @@ public class Ally_Ranged : MonoBehaviour {
 	public bool isAlive(){
 		return alive;
 	}
-
+	public void setIndexLoc(int n){
+		indexLoc = n;
+	}
 }
