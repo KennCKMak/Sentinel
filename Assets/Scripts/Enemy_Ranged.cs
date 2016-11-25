@@ -120,7 +120,7 @@ public class Enemy_Ranged : MonoBehaviour {
 			health = health - col.GetComponent<Player_Projectile> ().wpnDmg;
 			if (col.GetComponent<Player_Projectile> ().punchthrough >= 1) {
 				col.GetComponent<Player_Projectile> ().punchthrough--;
-			} else if (col.GetComponent<Player_Projectile> ().punchthrough == 1) {
+			} else if (col.GetComponent<Player_Projectile> ().punchthrough < 1) {
 				GameObject newProp = Instantiate (col.GetComponent<Player_Projectile> ().arrowProp,
 					col.transform.position, col.transform.rotation) as GameObject;
 				newProp.transform.parent = transform;
@@ -142,7 +142,7 @@ public class Enemy_Ranged : MonoBehaviour {
 		if (percentage > 0.50f)
 			HPImg.GetComponent<SpriteRenderer> ().color = Color.Lerp (Color.green, Color.yellow, (maxHealth - health) / (maxHealth / 2));
 		//i.e. @ 75hp, 100 - 75 = 25, divided by 50 gives you 0.5
-		else if (percentage <= 0.25f)
+		else if (percentage <= 0.50f)
 			HPImg.GetComponent<SpriteRenderer> ().color = Color.Lerp (Color.yellow, Color.red, (maxHealth/ - health) / (maxHealth / 2));
 		//i.e. @ 25hp, 50 - 25 = 25, divided by 50 gives you 0.5 again
 	

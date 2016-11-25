@@ -124,10 +124,12 @@ public class Enemy_Melee : MonoBehaviour {
 		Vector3 newPos = new Vector3 (leftMost + -leftMost*percentage, 0.0f, 0.0f); //moving hp loc to left
 								//-0.475 is the leftmost, add the percentage to return it back to the middle
 		HPImg.localPosition = newPos;
+
+
 		if (percentage > 0.50f)
 			HPImg.GetComponent<SpriteRenderer> ().color = Color.Lerp (Color.green, Color.yellow, (maxHealth - health) / (maxHealth / 2));
 			//i.e. @ 75hp, 100 - 75 = 25, divided by 50 gives you 0.5
-		 else if (percentage <= 0.25f)
+		 else if (percentage <= 0.50f)
 			HPImg.GetComponent<SpriteRenderer> ().color = Color.Lerp (Color.yellow, Color.red, (maxHealth/ - health) / (maxHealth / 2));
 			//i.e. @ 25hp, 50 - 25 = 25, divided by 50 gives you 0.5 again
 

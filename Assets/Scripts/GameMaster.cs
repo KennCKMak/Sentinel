@@ -21,7 +21,7 @@ public class GameMaster : MonoBehaviour {
 
 	//allied spearman counter
 	public GameObject spearmanPrefab;
-	private float spearmanX = 7.1511f;
+	private float spearmanX = 6.9511f;
 	public int spearmanCount = 0;
 	private int maxSpearman = 7;
 	private List<float> spearmanY = new List<float> (); //0.13f;
@@ -34,7 +34,7 @@ public class GameMaster : MonoBehaviour {
 	private int maxArcher = 4;
 	private List<float> archerY = new List<float>();
 	public GameObject[] Archers;
-
+	public int allyCount;
 	public List<GameObject> AllyList = new List<GameObject>();
 
 
@@ -56,9 +56,9 @@ public class GameMaster : MonoBehaviour {
 
 		if (EnemyList == null)
 			EnemyList.AddRange(GameObject.FindGameObjectsWithTag ("Enemy"));
-		StartCoroutine (spawnObject ());
 		if (AllyList == null)
 			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Ally"));
+		StartCoroutine (spawnObject ());
 	}
 	
 	// Update is called once per frame
@@ -87,7 +87,7 @@ public class GameMaster : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Alpha6)){
 			SpawnArcher ();
 			Debug.Log ("spawning archers");
-	}
+		}
 	}	
 
 	public void refreshEnemyList(){ //used by allies to find available enemies
@@ -102,7 +102,7 @@ public class GameMaster : MonoBehaviour {
 	public void refreshAllyList(){ //used by enemies to find available targets to shoot at
 		AllyList.Clear ();
 		AllyList.AddRange(GameObject.FindGameObjectsWithTag ("Ally"));
-		for (int i = 0; i < EnemyList.Count; i++) {
+		for (int i = 0; i < AllyList.Count; i++) {
 			if (AllyList [i] == null)
 				AllyList.RemoveAt (i);
 		}
@@ -142,8 +142,9 @@ public class GameMaster : MonoBehaviour {
 				GameObject newAlly = Instantiate(archerPrefab, 
 					new Vector2(archerX, archerY[i]), Quaternion.identity) as GameObject;
 				newAlly.GetComponent<Ally_Ranged> ().setIndexLoc (i);
-				spearmanCount++;
+				archerCount++;
 				Archers [i] = newAlly;
+				allyCount++;
 				return;
 			}
 		}
@@ -152,15 +153,13 @@ public class GameMaster : MonoBehaviour {
 		if (spearmanCount == maxSpearman)
 			return;
 		for (int i = 0; i < maxSpearman; i++) {
-			Debug.Log ("entering loop " + i);
-			Debug.Log("Checking Spears" + i + " = " + Spears[i]);
 			if (Spears [i] == null) {
-				Debug.Log("passed test");
 				GameObject newAlly = Instantiate(spearmanPrefab, 
 					new Vector2(spearmanX, spearmanY[i]), Quaternion.identity) as GameObject;
 				newAlly.GetComponent<Ally_Melee> ().setIndexLoc (i);
 				spearmanCount++;
 				Spears [i] = newAlly;
+				allyCount++;
 				return;
 			}
 		}
