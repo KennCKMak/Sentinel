@@ -19,3 +19,6 @@ C:\Users\Kenneth\Desktop\UnityProjects\Sentinel\Temp\bin\Debug\UnityEngine.Netwo
 C:\Users\Kenneth\Desktop\UnityProjects\Sentinel\obj\Debug\Assembly-CSharp.dll
 C:\Users\Kenneth\Desktop\UnityProjects\Sentinel\obj\Debug\Assembly-CSharp.pdb
 C:\Users\Kenneth\Desktop\UnityProjects\Sentinel\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+C:\Users\Kenneth\Documents\GitHub\Sentinel\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+C:\Users\Kenneth\Documents\GitHub\Sentinel\obj\Debug\Assembly-CSharp.dll
+C:\Users\Kenneth\Documents\GitHub\Sentinel\obj\Debug\Assembly-CSharp.pdb

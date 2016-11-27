@@ -10,13 +10,14 @@ public class Enemy_Projectile : MonoBehaviour {
 	private Rigidbody2D rb;
 	// Use this for initialization
 	void Start () {
-		dir.Normalize();
+		/*dir.Normalize();
 		rb = transform.GetComponent<Rigidbody2D> ();
 		rb.velocity = dir * speed*100 * Time.deltaTime;
-		Destroy (gameObject, 5f);
+		Destroy (gameObject, 5f);*/
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		transform.Translate (speed * Vector3.up * Time.deltaTime);
 	}
 }

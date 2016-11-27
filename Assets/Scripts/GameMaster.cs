@@ -10,14 +10,24 @@ public class GameMaster : MonoBehaviour {
 
 	public bool debugMode = true;
 
-	public List<float> yRange = new List<float>(); //y value for grids
 
 	//enemies...
+	//enemy rifle counter
+	public List<float> yRange = new List<float>(); //y value for grids spawn
 	public GameObject riflePrefab;
+	public int rifleCount = 0;
+	public int maxRifle = 3;
+	public GameObject[] Rifles;
+	//enemy warrior counter
 	public GameObject warriorPrefab;
+	public int warriorCount = 0;
+	public int maxWarrior = 7;
+	public GameObject[] Warriors;
+
+
 	public int enemyCount;
-	public List<GameObject> EnemyList = new List<GameObject> ();
 	public int maxEnemy;
+	public List<GameObject> EnemyList = new List<GameObject> ();
 
 	//allied spearman counter
 	public GameObject spearmanPrefab;
@@ -39,7 +49,7 @@ public class GameMaster : MonoBehaviour {
 
 
 	void Start () {
-		Time.timeScale = 1;
+		Time.timeScale = 2;
 
 		for (int i = 0; i < 7; i++) { //setting up the 7 grids
 			yRange.Add(-2.62f + i * 1); //setting up grid yaxis
@@ -50,36 +60,23 @@ public class GameMaster : MonoBehaviour {
 		spearmanY.Add (1.51f);spearmanY.Add (-0.49f);spearmanY.Add (3.51f);spearmanY.Add (-2.49f);
 		archerY.Add (1.88f); archerY.Add (-1.13f); archerY.Add (3.38f); archerY.Add (-2.62f);
 		//middle top, middle bottom, top, and bottom position
+		Warriors = new GameObject[maxWarrior];
+		Rifles = new GameObject[maxRifle];
 		Spears = new GameObject[maxSpearman];
 		Archers = new GameObject[maxArcher];
 
 
 		if (EnemyList == null)
 			EnemyList.AddRange(GameObject.FindGameObjectsWithTag ("Enemy"));
-		if (AllyList == null)
+		if (AllyList == null) {
+			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Player"));
 			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Ally"));
+		}
 		StartCoroutine (spawnObject ());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (enemyCount < maxEnemy) {
-			int num = Random.Range (0, 2); //spawning the warriors
-			switch (num) {
-			case(0):
-				Instantiate (warriorPrefab, new Vector2 (xStart, yRange [Random.Range (0, yRange.Count)]), transform.rotation);
-				enemyCount++;
-				break;
-			case(1):
-				Instantiate (riflePrefab, new Vector2 (xStart, yRange [Random.Range (0, yRange.Count)]), transform.rotation);
-				enemyCount++;
-				break;
-			default:
-				break;
-			}
-			refreshEnemyList ();
-		}
-
 		if (Input.GetKeyDown (KeyCode.Alpha5)) {
 			SpawnSpearman ();
 			Debug.Log ("spawning spears");
@@ -89,7 +86,7 @@ public class GameMaster : MonoBehaviour {
 			Debug.Log ("spawning archers");
 		}
 	}	
-
+	//ENEMY SPAWN FUNCTIONS
 	public void refreshEnemyList(){ //used by allies to find available enemies
 		EnemyList.Clear ();
 		EnemyList.AddRange(GameObject.FindGameObjectsWithTag ("Enemy"));
@@ -99,12 +96,40 @@ public class GameMaster : MonoBehaviour {
 		}
 	}
 
-	public void refreshAllyList(){ //used by enemies to find available targets to shoot at
-		AllyList.Clear ();
-		AllyList.AddRange(GameObject.FindGameObjectsWithTag ("Ally"));
-		for (int i = 0; i < AllyList.Count; i++) {
-			if (AllyList [i] == null)
-				AllyList.RemoveAt (i);
+
+	public void SpawnWarrior(){
+		if (warriorCount >= maxWarrior)
+			return;
+		for (int i = 0; i < maxWarrior; i++) {
+			if (Warriors [i] == null) {		
+				enemyCount++;
+				GameObject newEnemy = Instantiate (warriorPrefab,
+					new Vector2 (xStart, yRange [Random.Range (0, yRange.Count)]), transform.rotation) as GameObject;
+				newEnemy.GetComponent<Enemy_Melee> ().enemy.setIndexLoc (i);
+				warriorCount++;
+				Warriors [i] = newEnemy;
+				enemyCount++;
+				refreshEnemyList ();
+				return;
+			}
+		}
+	}
+
+	public void SpawnRifle(){
+		if (rifleCount >= maxRifle)
+			return;
+		for (int i = 0; i < maxRifle; i++) {
+			if (Rifles [i] == null) {		
+				enemyCount++;
+				GameObject newEnemy = Instantiate (riflePrefab,
+					new Vector2 (xStart, yRange [Random.Range (0, yRange.Count)]), transform.rotation) as GameObject;
+				newEnemy.GetComponent<Enemy_Ranged> ().enemy.setIndexLoc (i);
+				rifleCount++;
+				Rifles [i] = newEnemy;
+				enemyCount++;
+				refreshEnemyList ();
+				return;
+			}
 		}
 	}
 
@@ -123,45 +148,72 @@ public class GameMaster : MonoBehaviour {
 		refreshEnemyList ();
 	}
 		
-
+	/*TIMER FOR SPAWNING ENEMEIS*/
 	IEnumerator spawnObject()
 	{
+		int num;
 		while (true) {
-			yield return new WaitForSeconds (30f);
-			SpawnPlatoon (0);
-			yield return new WaitForSeconds (30f);
-			SpawnPlatoon (1);
+			num = Random.Range (0, 4);
+			switch (num) {
+			case(0):
+			case(1):
+			//case(2):
+				SpawnWarrior ();
+				break;
+			case(2):
+			case(3):
+				SpawnRifle ();
+				break;
+			default:
+				break;
+			}
+			yield return new WaitForSeconds (1f);
+		}
+	}
+
+	//ALLIED SPAWN FUNCTIONS
+	public void refreshAllyList(){ //used by enemies to find available targets to shoot at
+		AllyList.Clear ();
+		AllyList.AddRange(GameObject.FindGameObjectsWithTag ("Ally"));
+		for (int i = 0; i < AllyList.Count; i++) {
+			if (AllyList [i] == null)
+				AllyList.RemoveAt (i);
 		}
 	}
 
 	public void SpawnArcher(){
-		if (archerCount == maxArcher)
+		if (archerCount >= maxArcher)
 			return;
 		for (int i = 0; i < maxArcher; i++) {
 			if (Archers [i] == null) {
 				GameObject newAlly = Instantiate(archerPrefab, 
 					new Vector2(archerX, archerY[i]), Quaternion.identity) as GameObject;
-				newAlly.GetComponent<Ally_Ranged> ().setIndexLoc (i);
+				newAlly.GetComponent<Ally_Ranged> ().ally.setIndexLoc (i);
 				archerCount++;
 				Archers [i] = newAlly;
 				allyCount++;
+				refreshAllyList ();
 				return;
 			}
 		}
 	}
+
 	public void SpawnSpearman(){
-		if (spearmanCount == maxSpearman)
+		if (spearmanCount >= maxSpearman)
 			return;
 		for (int i = 0; i < maxSpearman; i++) {
 			if (Spears [i] == null) {
 				GameObject newAlly = Instantiate(spearmanPrefab, 
 					new Vector2(spearmanX, spearmanY[i]), Quaternion.identity) as GameObject;
-				newAlly.GetComponent<Ally_Melee> ().setIndexLoc (i);
+				newAlly.GetComponent<Ally_Melee> ().ally.setIndexLoc (i);
 				spearmanCount++;
 				Spears [i] = newAlly;
 				allyCount++;
+				refreshAllyList ();
 				return;
 			}
 		}
 	}
+
+
 }

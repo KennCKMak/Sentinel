@@ -15,4 +15,5 @@ public class Player_Projectile : MonoBehaviour {
 	void Update () {
 		transform.Translate (speed * Vector3.up * Time.deltaTime);
 	}
+
 }
