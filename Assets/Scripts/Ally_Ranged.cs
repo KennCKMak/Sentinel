@@ -51,7 +51,8 @@ public class Ally_Ranged : MonoBehaviour {
 			newArrow.tag = "Player_Projectile";
 			newArrow.AddComponent<Player_Projectile> ();
 			newArrow.GetComponent<Player_Projectile> ().speed = 10f;
-			newArrow.GetComponent<Player_Projectile> ().wpnDmg = ally.wpnDmg;
+			newArrow.GetComponent<Player_Projectile> ().punchthrough = ally.retPunchthroughLevel ();
+			newArrow.GetComponent<Player_Projectile> ().wpnDmg = ally.wpnDmg + ally.wpnDmg * ally.retDamageLevel() * 0.5f;
 			ally.setElapsedTime (0); //elapsedTime = 0;
 		}
 		ally.incElapsedTime (); //elapsedTime+=Time.deltaTime

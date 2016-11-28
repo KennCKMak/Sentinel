@@ -53,7 +53,6 @@
      <Compile Include="Assets\Scripts\Enemy_Melee.cs" />
      <Compile Include="Assets\Scripts\Enemy_Projectile.cs" />
      <Compile Include="Assets\Scripts\Enemy_Ranged.cs" />
-     <Compile Include="Assets\Scripts\Entity.cs" />
      <Compile Include="Assets\Scripts\GameMaster.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\Player_Projectile.cs" />

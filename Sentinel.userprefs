@@ -1,14 +1,18 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Entity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player.cs">
     <Files>
-      <File FileName="Assets\Scripts\Entity.cs" Line="20" Column="13" />
-      <File FileName="Assets\Scripts\EnemyClass.cs" Line="69" Column="36" />
-      <File FileName="Assets\Scripts\Enemy_Ranged.cs" Line="47" Column="2" />
-      <File FileName="Assets\Scripts\Enemy_Melee.cs" Line="28" Column="28" />
-      <File FileName="Assets\Scripts\AllyClass.cs" Line="71" Column="1" />
-      <File FileName="Assets\Scripts\Ally_Melee.cs" Line="72" Column="36" />
-      <File FileName="Assets\Scripts\Ally_Ranged.cs" Line="69" Column="19" />
+      <File FileName="Assets\Scripts\EnemyClass.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Enemy_Melee.cs" Line="11" Column="65" />
+      <File FileName="Assets\Scripts\Enemy_Ranged.cs" Line="18" Column="45" />
+      <File FileName="Assets\Scripts\AllyClass.cs" Line="45" Column="15" />
+      <File FileName="Assets\Scripts\Player.cs" Line="46" Column="39" />
+      <File FileName="Assets\Scripts\GameMaster.cs" Line="54" Column="21" />
+      <File FileName="Assets\Scripts\Ally_Melee.cs" Line="36" Column="23" />
+      <File FileName="Assets\Scripts\Ally_Ranged.cs" Line="54" Column="92" />
+      <File FileName="Assets\Scripts\Enemy_Projectile.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Player_Projectile.cs" Line="6" Column="22" />
+      <File FileName="Assets\Scripts\BorderScript.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

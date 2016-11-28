@@ -178,7 +178,7 @@ public class AllyClass : MonoBehaviour {
 		updateHP ();
 	}
 	public void takeDamage(float  num){
-		health = health - num * (1 - armour * 0.1f);
+		health = health - num * (1 - retArmourLevel() * 0.1f);
 		//armouru takes away 10% of the damage, up to cap of lvl5
 		updateHP ();
 	}
@@ -200,5 +200,18 @@ public class AllyClass : MonoBehaviour {
 	}
 	public int retIndexLoc(){
 		return indexLoc;
+	}
+	//arrow upgrades
+	public int retScatterLevel(){
+		return gameMaster.scatterLevel;
+	}
+	public int retPunchthroughLevel(){
+		return gameMaster.punchthroughLevel;
+	}
+	public int retDamageLevel(){
+		return gameMaster.damageLevel;
+	}
+	public int retArmourLevel(){
+		return gameMaster.armourLevel;
 	}
 }

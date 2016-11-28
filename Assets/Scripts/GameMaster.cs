@@ -4,31 +4,33 @@ using System.Collections.Generic;
 
 public class GameMaster : MonoBehaviour {
 
-	public float xStart = -10.76f;
-	public float xOnScreen = -9.11f;
-	public float xEnd = 4.16f;
-
 	public bool debugMode = true;
-
+	//Player things
+	public int punchthroughLevel = 0; //increases punchthrough amount of arrows
+	public int scatterLevel = 0; //increase arrow fired by player
+	public int damageLevel = 0; //increases damage by 50% / level
+	public int armourLevel = 0; //decrease damage taken by 10% per level
 
 	//enemies...
+	public float xStart = -10.76f; //offscreen spawns for enemy
 	//enemy rifle counter
 	public List<float> yRange = new List<float>(); //y value for grids spawn
 	public GameObject riflePrefab;
 	public int rifleCount = 0;
 	public int maxRifle = 3;
 	public GameObject[] Rifles;
+
 	//enemy warrior counter
 	public GameObject warriorPrefab;
 	public int warriorCount = 0;
 	public int maxWarrior = 7;
 	public GameObject[] Warriors;
 
-
 	public int enemyCount;
 	public int maxEnemy;
 	public List<GameObject> EnemyList = new List<GameObject> ();
 
+	//ALLY VARIABLES
 	//allied spearman counter
 	public GameObject spearmanPrefab;
 	private float spearmanX = 6.9511f;
@@ -49,7 +51,7 @@ public class GameMaster : MonoBehaviour {
 
 
 	void Start () {
-		Time.timeScale = 2;
+		Time.timeScale = 1;
 
 		for (int i = 0; i < 7; i++) { //setting up the 7 grids
 			yRange.Add(-2.62f + i * 1); //setting up grid yaxis
@@ -153,15 +155,12 @@ public class GameMaster : MonoBehaviour {
 	{
 		int num;
 		while (true) {
-			num = Random.Range (0, 4);
+			num = Random.Range (0, 2);
 			switch (num) {
 			case(0):
-			case(1):
-			//case(2):
 				SpawnWarrior ();
 				break;
-			case(2):
-			case(3):
+			case(1):
 				SpawnRifle ();
 				break;
 			default:
