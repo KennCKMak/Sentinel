@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Player : MonoBehaviour {
@@ -21,12 +22,20 @@ public class Player : MonoBehaviour {
 	private float angleOdd = 2f;
 	public GameObject arrow;
 
+	protected GameObject HealthBar; //access to the health bar
+	protected GameObject HPImg;
+	protected float leftMost = -109.7f;
 
 
 	// Use this for initialization
 	void Start () {	
 		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
+
 		health = maxHealth;
+		alive = true;
+		HealthBar = GameObject.Find ("Canvas").transform.FindChild ("UpperBorder").transform.FindChild ("HealthBar").gameObject;
+		HPImg = HealthBar.transform.FindChild ("HPImg").gameObject;
+		updateHP ();
 	}
 	
 	// Update is called once per frame
@@ -63,6 +72,7 @@ public class Player : MonoBehaviour {
 				break;
 			}
 		}
+		updateHP ();
 	}
 
 	void FireArrow(){
@@ -132,14 +142,12 @@ public class Player : MonoBehaviour {
 		newArrow.transform.localScale = newSize;
 	}
 
-
 	void OnTriggerEnter2D(Collider2D col){
 		if (col.tag == "Enemy_Projectile") {
-			health = health - col.GetComponent<Enemy_Projectile> ().wpnDmg;
+			takeDamage(col.GetComponent<Enemy_Projectile> ().wpnDmg);
 			Destroy (col.gameObject);
 			//if ded
 		}
-
 	}
 
 	//getting upgrades from main
@@ -155,5 +163,51 @@ public class Player : MonoBehaviour {
 	int retArmourLevel(){
 		return gameMaster.armourLevel;
 	}
+	//_______Health Functions_______//
+	public void healDamage(float num){
+		health = health + num;
+		updateHP ();
+	}
+	public void takeDamage(float  num){
+		health = health - num * (1 - retArmourLevel() * 0.1f);
+		//armouru takes away 10% of the damage, up to cap of lvl5
+		updateHP ();
+	}
+	public float returnHP(){
+		return health;
+	}
+	//_______Alive Check Functions_______//
+	public bool isAlive(){
+		return alive;
+	}
+	public void setAlive(bool b){
+		setAlive (b);
+	}	//_______HEALTH BAR FUNCTIONS_______//
 
+	public void updateHP(){
+		if (alive) {
+			float percentage = health / maxHealth;
+			Vector3 newScale = new Vector3 (0.98f * percentage + 0.0000001f, 0.80f, 1);
+			HPImg.GetComponent<RectTransform> ().localScale = newScale; //scaling it.
+			Vector3 newLoc = new Vector3 (leftMost + -leftMost * percentage, 0, 0);
+			//leftMost + -leftMost*percentage
+			HPImg.GetComponent<RectTransform> ().localPosition = newLoc;
+
+
+			if (percentage > 0.50f)
+				HPImg.GetComponent<RawImage> ().color = Color.Lerp (Color.green, Color.yellow, (maxHealth - health) / (maxHealth / 2));
+		//i.e. @ 75hp, 100 - 75 = 25, divided by 50 gives you 0.5
+		else if (percentage <= 0.50f)
+				HPImg.GetComponent<RawImage> ().color = Color.Lerp (Color.yellow, Color.red, (maxHealth - health) / (maxHealth / 2));
+			//i.e. @ 25hp, 50 - 25 = 25, divided by 50 gives you 0.5 again
+			Die ();
+		}
+	}
+	public void Die(){ //if dead
+		if (health <= 0 && alive) {
+			alive = !alive;
+			GetComponent<CircleCollider2D> ().enabled = false;
+			Destroy (gameObject, 1f);
+		}
+	}
 }

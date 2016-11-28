@@ -49,21 +49,31 @@ public class Enemy_Melee : MonoBehaviour {
 	}
 
 	public void Attack(){
+		Debug.Log ("attacking");
 		if (enemy.returnElapsedTime() > enemy.wpnSpeed && enemy.inCombat){
-			if (enemy.returnTarget().GetComponent<Ally_Melee> () != null) {
-				if (enemy.returnTarget().GetComponent<Ally_Melee> ().ally.isAlive ()) {
-					enemy.returnTarget().GetComponent<Ally_Melee> ().ally.takeDamage (enemy.wpnDmg);
+			if (enemy.returnTarget ().GetComponent<Ally_Melee> () != null) {
+				if (enemy.returnTarget ().GetComponent<Ally_Melee> ().ally.isAlive ()) {
+					enemy.returnTarget ().GetComponent<Ally_Melee> ().ally.takeDamage (enemy.wpnDmg);
 				} else {
 					enemy.nullTarget ();
 					enemy.GetTarget ();
 				}
-			} else if (enemy.returnTarget().GetComponent<Ally_Ranged> () != null) {
-				if (enemy.returnTarget().GetComponent<Ally_Melee> ().ally.isAlive ()) {
-					enemy.returnTarget().GetComponent<Ally_Melee> ().ally.takeDamage (enemy.wpnDmg);
+			} else if (enemy.returnTarget ().GetComponent<Ally_Ranged> () != null) {
+				if (enemy.returnTarget ().GetComponent<Ally_Ranged> ().ally.isAlive ()) {
+					enemy.returnTarget ().GetComponent<Ally_Ranged> ().ally.takeDamage (enemy.wpnDmg);
 				} else {
 					enemy.nullTarget ();
 					enemy.GetTarget ();
 				}
+			} else if (enemy.returnTarget ().GetComponent<Player> () != null) {
+				if (enemy.returnTarget ().GetComponent<Player> ().isAlive ()) {
+					enemy.returnTarget ().GetComponent<Player> ().takeDamage (enemy.wpnDmg);
+					Debug.Log ("enemy attacked Player");
+				} else {
+					enemy.nullTarget ();
+					enemy.GetTarget ();
+				}
+
 			}
 			enemy.setElapsedTime(0);
 		}

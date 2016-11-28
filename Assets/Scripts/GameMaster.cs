@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class GameMaster : MonoBehaviour {
 
 	public bool debugMode = true;
+	public float timeScale;
+
 	//Player things
 	public int punchthroughLevel = 0; //increases punchthrough amount of arrows
 	public int scatterLevel = 0; //increase arrow fired by player
@@ -51,7 +53,8 @@ public class GameMaster : MonoBehaviour {
 
 
 	void Start () {
-		Time.timeScale = 1;
+		if(debugMode)
+			Time.timeScale = timeScale;
 
 		for (int i = 0; i < 7; i++) { //setting up the 7 grids
 			yRange.Add(-2.62f + i * 1); //setting up grid yaxis
