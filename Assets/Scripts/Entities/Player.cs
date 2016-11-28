@@ -26,14 +26,20 @@ public class Player : MonoBehaviour {
 	protected GameObject HPImg;
 	protected float leftMost = -109.7f;
 
-
+	private GameObject canvas;
+	private CanvasScript canvasScript;
 	// Use this for initialization
 	void Start () {	
 		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
 
 		health = maxHealth;
 		alive = true;
-		HealthBar = GameObject.Find ("Canvas").transform.FindChild ("UpperBorder").transform.FindChild ("HealthBar").gameObject;
+		canvas = GameObject.Find ("Canvas").gameObject;
+		canvasScript = canvas.GetComponent<CanvasScript> ();
+		HealthBar = canvas.transform.FindChild ("UpperBorder").transform.FindChild ("HealthBar").gameObject;
+		leftMost = HealthBar.transform.FindChild ("HPImgLoc").GetComponent<RectTransform> ().localPosition.x;
+		WeaponSelect (1);
+
 		HPImg = HealthBar.transform.FindChild ("HPImg").gameObject;
 		updateHP ();
 	}
@@ -49,11 +55,11 @@ public class Player : MonoBehaviour {
 
 		//switching weapons
 		if (Input.GetKeyDown(KeyCode.Alpha1))
-			weapon = 1;
+			WeaponSelect (1);
 		if (Input.GetKeyDown (KeyCode.Alpha2))
-			weapon = 2;
+			WeaponSelect (2);
 		if (Input.GetKeyDown (KeyCode.Alpha3))
-			weapon = 3;
+			WeaponSelect (3);
 
 		//shooting
 		if(Input.GetMouseButtonDown(0)) {
@@ -150,6 +156,33 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	//_______HEALTH BAR FUNCTIONS_______//
+	public void updateHP(){
+		if (alive) {
+			float percentage = health / maxHealth;
+			Vector3 newScale = new Vector3 (0.98f * percentage + 0.0000001f, 0.80f, 1);
+			HPImg.GetComponent<RectTransform> ().localScale = newScale; //scaling it.
+			Vector3 newLoc = new Vector3 (leftMost + -leftMost * percentage, 0, 0);
+			//leftMost + -leftMost*percentage //456.45
+			HPImg.GetComponent<RectTransform> ().localPosition = newLoc;
+
+			if (percentage > 0.50f)
+				HPImg.GetComponent<RawImage> ().color = Color.Lerp (Color.green, Color.yellow, (maxHealth - health) / (maxHealth / 2));
+			//i.e. @ 75hp, 100 - 75 = 25, divided by 50 gives you 0.5
+			else if (percentage <= 0.50f)
+				HPImg.GetComponent<RawImage> ().color = Color.Lerp (Color.yellow, Color.red, (maxHealth - health) / (maxHealth / 2));
+			//i.e. @ 25hp, 50 - 25 = 25, divided by 50 gives you 0.5 again
+			Die ();
+		}
+	}
+	public void Die(){ //if dead
+		if (health <= 0 && alive) {
+			alive = !alive;
+			GetComponent<CircleCollider2D> ().enabled = false;
+			Destroy (HPImg);
+			Destroy (gameObject, 1f);
+		}
+	}
 	//getting upgrades from main
 	int retScatterLevel(){
 		return gameMaster.scatterLevel;
@@ -182,32 +215,24 @@ public class Player : MonoBehaviour {
 	}
 	public void setAlive(bool b){
 		setAlive (b);
-	}	//_______HEALTH BAR FUNCTIONS_______//
 
-	public void updateHP(){
-		if (alive) {
-			float percentage = health / maxHealth;
-			Vector3 newScale = new Vector3 (0.98f * percentage + 0.0000001f, 0.80f, 1);
-			HPImg.GetComponent<RectTransform> ().localScale = newScale; //scaling it.
-			Vector3 newLoc = new Vector3 (leftMost + -leftMost * percentage, 0, 0);
-			//leftMost + -leftMost*percentage
-			HPImg.GetComponent<RectTransform> ().localPosition = newLoc;
-
-
-			if (percentage > 0.50f)
-				HPImg.GetComponent<RawImage> ().color = Color.Lerp (Color.green, Color.yellow, (maxHealth - health) / (maxHealth / 2));
-		//i.e. @ 75hp, 100 - 75 = 25, divided by 50 gives you 0.5
-		else if (percentage <= 0.50f)
-				HPImg.GetComponent<RawImage> ().color = Color.Lerp (Color.yellow, Color.red, (maxHealth - health) / (maxHealth / 2));
-			//i.e. @ 25hp, 50 - 25 = 25, divided by 50 gives you 0.5 again
-			Die ();
-		}
 	}
-	public void Die(){ //if dead
-		if (health <= 0 && alive) {
-			alive = !alive;
-			GetComponent<CircleCollider2D> ().enabled = false;
-			Destroy (gameObject, 1f);
+
+	//selecting weapon
+	public void WeaponSelect(int num){
+		weapon = num;
+		switch (num) {
+		case(1):
+			canvasScript.SwitchWeapon (1);
+			break;
+		case(2):
+			canvasScript.SwitchWeapon (2);
+			break;
+		case(3):
+			canvasScript.SwitchWeapon (3);
+			break;
+		default:
+			break;
 		}
 	}
 }

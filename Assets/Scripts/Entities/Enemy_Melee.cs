@@ -1,29 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Enemy_Ranged : MonoBehaviour {
-
-	private GameObject idleImg;
-	private GameObject fireImg;
-	private GameObject bulletSpawn;
-	public GameObject bulletPrefab;
-
+public class Enemy_Melee : MonoBehaviour {
+	
 	public EnemyClass enemy;
 
 	private Rigidbody2D rb;
 
-	// Use this for initialization
 	void Start () {
 		enemy.setTarget (GameObject.FindGameObjectWithTag ("Player"));
-		enemy.myClass = EnemyClass.unitTypes.RIFLE;
-
-		idleImg = transform.FindChild ("IdleImg").gameObject;
-		fireImg = transform.FindChild ("FireImg").gameObject;
-		bulletSpawn = transform.FindChild ("BulletSpawn").gameObject;
+		enemy.myClass = EnemyClass.unitTypes.WARRIOR;
 
 		rb = transform.GetComponent<Rigidbody2D> ();
 		rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-
 	}
 
 	// Update is called once per frame
@@ -35,21 +24,19 @@ public class Enemy_Ranged : MonoBehaviour {
 					rb.velocity = new Vector2 (0, 0);
 					enemy.rotateToTarget (enemy.returnTargetPosition (), transform.position);
 					enemy.inCombat = true;
-					idleImg.SetActive (false);
-					fireImg.SetActive (true);
 					Attack ();
 				} else {
 					Walk ();
 					enemy.inCombat = false;
-					idleImg.SetActive (true);
-					fireImg.SetActive (false);
 				}
 				if (enemy.inCombat && enemy.returnTarget () != null)
 					Attack ();
 				else
 					enemy.setElapsedTime (0);
 			} else { //if no targets
-				enemy.GetTarget ();
+				enemy.inCombat = false;
+				Walk ();
+				enemy.rotateToTarget (new Quaternion(0, 0, 0, 1), transform.rotation);
 			} 
 		} else { //if not alive
 			rb.velocity = new Vector2 (0, 0);
@@ -57,22 +44,40 @@ public class Enemy_Ranged : MonoBehaviour {
 
 	}
 
-	public void Attack() { //since this is a ranged attack, we need to override the melee attack function
-		if (enemy.returnElapsedTime() > enemy.wpnSpeed + Random.value*0.5f){
-			/*GameObject newArrow = Instantiate (arrowPrefab, arrowSpawn.transform.position, arrowSpawn.transform.rotation) as GameObject;
-			newArrow.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z+90.9f);*/
-			GameObject newBullet = Instantiate (bulletPrefab, bulletSpawn.transform.position, bulletSpawn.transform.rotation) as GameObject;
-			//newBullet.GetComponent<Enemy_Projectile> ().dir = enemy.returnTargetPosition () - bulletSpawn.transform.position;
-			newBullet.GetComponent<Enemy_Projectile> ().wpnDmg = enemy.wpnDmg;
-			newBullet.tag = "Enemy_Projectile";
-			enemy.setElapsedTime (0);
-		}
-		enemy.incElapsedTime ();
-
-	}
-
 	void Walk (){
 		rb.velocity = (transform.right * enemy.speed * Time.deltaTime);
+		if(transform.position.x > 0 && enemy.returnTarget() != null)
+			 enemy.rotateToTarget (enemy.returnTargetPosition (), transform.position);
+	}
+
+	public void Attack(){
+		if (enemy.returnElapsedTime() > enemy.wpnSpeed && enemy.inCombat){
+			if (enemy.returnTarget ().GetComponent<Ally_Melee> () != null) {
+				if (enemy.returnTarget ().GetComponent<Ally_Melee> ().ally.isAlive ()) {
+					enemy.returnTarget ().GetComponent<Ally_Melee> ().ally.takeDamage (enemy.wpnDmg);
+				} else {
+					enemy.nullTarget ();
+					enemy.GetTarget ();
+				}
+			} else if (enemy.returnTarget ().GetComponent<Ally_Ranged> () != null) {
+				if (enemy.returnTarget ().GetComponent<Ally_Ranged> ().ally.isAlive ()) {
+					enemy.returnTarget ().GetComponent<Ally_Ranged> ().ally.takeDamage (enemy.wpnDmg);
+				} else {
+					enemy.nullTarget ();
+					enemy.GetTarget ();
+				}
+			} else if (enemy.returnTarget ().GetComponent<Player> () != null) {
+				if (enemy.returnTarget ().GetComponent<Player> ().isAlive ()) {
+					enemy.returnTarget ().GetComponent<Player> ().takeDamage (enemy.wpnDmg);
+				} else {
+					enemy.nullTarget ();
+					enemy.GetTarget ();
+				}
+
+			}
+			enemy.setElapsedTime(0);
+		}
+		enemy.incElapsedTime();
 	}
 
 	void OnTriggerEnter2D(Collider2D col){
@@ -91,4 +96,6 @@ public class Enemy_Ranged : MonoBehaviour {
 			enemy.updateHP ();
 		}
 	}
+
+
 }

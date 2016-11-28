@@ -14,6 +14,11 @@ public class BorderScript : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D c){
-		DestroyObject (c);
+		if (c.tag == "Border")
+			return;
+		if (c.tag == "Enemy")
+			c.gameObject.GetComponent<EnemyClass> ().takeDamage (9999999);
+		else
+			DestroyObject (c);
 	}
 }
