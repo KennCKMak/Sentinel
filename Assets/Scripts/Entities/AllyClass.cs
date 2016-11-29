@@ -4,6 +4,7 @@ using System.Collections;
 public class AllyClass : MonoBehaviour {
 
 	protected GameMaster gameMaster;
+	protected NumberMaster numberMaster;
 
 	public float health;
 	public float maxHealth;
@@ -39,6 +40,7 @@ public class AllyClass : MonoBehaviour {
 
 	void Start(){
 		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
+		numberMaster = GameObject.Find ("GameMaster").GetComponent<NumberMaster> ();
 		alive = true;
 		health = maxHealth;
 		createHealthBar ();
@@ -203,15 +205,15 @@ public class AllyClass : MonoBehaviour {
 	}
 	//arrow upgrades
 	public int retScatterLevel(){
-		return gameMaster.scatterLevel;
+		return numberMaster.scatterLevel;
 	}
 	public int retPunchthroughLevel(){
-		return gameMaster.punchthroughLevel;
+		return numberMaster.punchthroughLevel;
 	}
 	public int retDamageLevel(){
-		return gameMaster.damageLevel;
+		return numberMaster.damageLevel;
 	}
 	public int retArmourLevel(){
-		return gameMaster.armourLevel;
+		return numberMaster.armourLevel;
 	}
 }

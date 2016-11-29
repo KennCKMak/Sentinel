@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\CanvasScript.cs" />
+     <Compile Include="Assets\NumberMaster.cs" />
      <Compile Include="Assets\Scripts\BorderScript.cs" />
      <Compile Include="Assets\Scripts\Entities\AllyClass.cs" />
      <Compile Include="Assets\Scripts\Entities\Ally_Melee.cs" />

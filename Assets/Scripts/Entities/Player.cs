@@ -5,6 +5,7 @@ using System.Collections;
 public class Player : MonoBehaviour {
 
 	private GameMaster gameMaster;
+	private NumberMaster numberMaster;
 
 	public GameObject arrowTip;
 	public GameObject arrowBase;
@@ -18,8 +19,7 @@ public class Player : MonoBehaviour {
 
 	private int weapon = 1;
 	//this is the angle for firing...
-	private float angleEven = 2f;
-	private float angleOdd = 2f;
+	private float angle = 2f;
 	public GameObject arrow;
 
 	protected GameObject HealthBar; //access to the health bar
@@ -31,6 +31,7 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Start () {	
 		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
+		numberMaster = GameObject.Find ("GameMaster").GetComponent<NumberMaster> ();
 
 		health = maxHealth;
 		alive = true;
@@ -38,12 +39,19 @@ public class Player : MonoBehaviour {
 		canvasScript = canvas.GetComponent<CanvasScript> ();
 		HealthBar = canvas.transform.FindChild ("UpperBorder").transform.FindChild ("HealthBar").gameObject;
 		leftMost = HealthBar.transform.FindChild ("HPImgLoc").GetComponent<RectTransform> ().localPosition.x;
-		WeaponSelect (1);
 
 		HPImg = HealthBar.transform.FindChild ("HPImg").gameObject;
 		updateHP ();
+
+		StartCoroutine (LateStart (0.1f));
 	}
-	
+
+	IEnumerator LateStart(float num){
+		yield return new WaitForSeconds (num);
+		canvasScript.SwitchWeapon (1);
+	}
+
+
 	// Update is called once per frame
 	void Update() {
 		//rotating to mouse location
@@ -68,7 +76,7 @@ public class Player : MonoBehaviour {
 				FireArrow ();
 				break;
 			case(2):
-				FireScatterArrow (retScatterLevel()+1);
+				FireScatterArrow (retScatterLevel()+2);
 				break;
 			case(3):
 				Debug.Log ("Firing Ballista");
@@ -112,22 +120,23 @@ public class Player : MonoBehaviour {
 	}
 
 	void FireScatterArrow(int num){
-		if (num == 0 || num == 1)
+		float tempAngle = angle - (0.15f * (retScatterLevel()+1));
+		if (num == 0)
 			FireArrow ();
 		else {
 			if (num % 2 == 0) {//even number of arrows 
 				for (int i = 0; i < num; i++) {
 					i++;
-					FireArrow (angleEven + i * angleEven);
-					FireArrow (-angleEven - i * angleEven);
+					FireArrow (tempAngle + i * tempAngle - tempAngle/1.5f);
+					FireArrow (-tempAngle - i * tempAngle + tempAngle/1.5f);
 				}
 			} else { //odd number of arrows
 				FireArrow(); //fires a straight arrow
 				num--;// we fired one
 				for (int i = 0; i < num; i++) {
 					i++; //we fired twice, once in for and once here
-					FireArrow (angleOdd + i * angleOdd); //fires one arrow angled up
-					FireArrow (-angleOdd - i * angleOdd); //fires one arrow angled down
+					FireArrow (tempAngle + i * tempAngle); //fires one arrow angled up
+					FireArrow (-tempAngle - i * tempAngle); //fires one arrow angled down
 				}
 			}
 		}
@@ -185,16 +194,16 @@ public class Player : MonoBehaviour {
 	}
 	//getting upgrades from main
 	int retScatterLevel(){
-		return gameMaster.scatterLevel;
+		return numberMaster.scatterLevel+1;
 	}
 	int retPunchthroughLevel(){
-		return gameMaster.punchthroughLevel;
+		return numberMaster.punchthroughLevel;
 	}
 	int retDamageLevel(){
-		return gameMaster.damageLevel;
+		return numberMaster.damageLevel;
 	}
 	int retArmourLevel(){
-		return gameMaster.armourLevel;
+		return numberMaster.armourLevel;
 	}
 	//_______Health Functions_______//
 	public void healDamage(float num){

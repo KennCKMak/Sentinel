@@ -3,6 +3,7 @@ using System.Collections;
 
 public class EnemyClass : MonoBehaviour {
 	protected GameMaster gameMaster;
+	private NumberMaster numberMaster;
 
 	public float health;
 	public float maxHealth;
@@ -18,7 +19,7 @@ public class EnemyClass : MonoBehaviour {
 	public GameObject HealthBarPrefab; //the health bar prefab
 	protected GameObject HealthBar; //access to the health bar
 	protected Transform HealthBarLocation; //location of the health bar
-	protected Transform HPImg;
+	public Transform HPImg;
 	protected float leftMost = -0.475f;
 
 
@@ -30,12 +31,14 @@ public class EnemyClass : MonoBehaviour {
 
 	public enum unitTypes{
 		RIFLE,
-		WARRIOR
+		WARRIOR,
+		WARLORD
 	};
 	public unitTypes myClass;
 
 	void Start(){
 		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
+		numberMaster = GameObject.Find ("GameMaster").GetComponent<NumberMaster> ();
 		alive = true;
 		health = maxHealth;
 		createHealthBar ();
@@ -78,6 +81,7 @@ public class EnemyClass : MonoBehaviour {
 			transform.tag = "Untagged";
 			gameMaster.refreshEnemyList ();
 			gameMaster.enemyCount--;
+			numberMaster.enemiesKilled++;
 			Die2 ();
 			Destroy (gameObject, 1f);
 		}
@@ -86,10 +90,16 @@ public class EnemyClass : MonoBehaviour {
 		if (myClass == unitTypes.RIFLE){
 			gameMaster.rifleCount--;
 			gameMaster.Rifles [indexLoc] = null; //setting its position in the allyarray to null
+			numberMaster.score += 5;
 		} else if (myClass == unitTypes.WARRIOR){
 			gameMaster.warriorCount--;
 			gameMaster.Warriors [indexLoc] = null; //setting its position in the allyarray to null
-		} 
+			numberMaster.score += 2;
+		} else if (myClass == unitTypes.WARLORD){
+		gameMaster.warlordCount--;
+		gameMaster.Warlords [indexLoc] = null; //setting its position in the allyarray to null
+		numberMaster.score += 10;
+	} 
 	}
 
 

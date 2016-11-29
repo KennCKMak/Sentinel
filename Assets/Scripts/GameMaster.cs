@@ -7,47 +7,49 @@ public class GameMaster : MonoBehaviour {
 	public bool debugMode = true;
 	public float timeScale;
 
-	//Player things
-	public int punchthroughLevel = 0; //increases punchthrough amount of arrows
-	public int scatterLevel = 0; //increase arrow fired by player
-	public int damageLevel = 0; //increases damage by 50% / level
-	public int armourLevel = 0; //decrease damage taken by 10% per level
+
 
 	//enemies...
+	public bool spawning;
 	public float xStart = -10.76f; //offscreen spawns for enemy
-	//enemy rifle counter
 	public List<float> yRange = new List<float>(); //y value for grids spawn
+	//enemy rifle counter
+	public GameObject[] Rifles;
 	public GameObject riflePrefab;
 	public int rifleCount = 0;
 	public int maxRifle = 3;
-	public GameObject[] Rifles;
 
 	//enemy warrior counter
+	public GameObject[] Warriors;
 	public GameObject warriorPrefab;
 	public int warriorCount = 0;
 	public int maxWarrior = 7;
-	public GameObject[] Warriors;
+
+	//enemy warlord counter
+	public GameObject[] Warlords;
+	public GameObject warlordPrefab;
+	public int warlordCount = 0;
+	public int maxWarlord = 7;
 
 	public int enemyCount;
-	public int maxEnemy;
 	public List<GameObject> EnemyList = new List<GameObject> ();
 
 	//ALLY VARIABLES
 	//allied spearman counter
+	public GameObject[] Spears;
 	public GameObject spearmanPrefab;
 	private float spearmanX = 6.9511f;
 	public int spearmanCount = 0;
 	private int maxSpearman = 7;
 	private List<float> spearmanY = new List<float> (); //0.13f;
-	public GameObject[] Spears;
 
 	//allied archer counter
+	public GameObject[] Archers;
 	public GameObject archerPrefab;
 	private float archerX = 8.73f;
 	public int archerCount = 0;
 	private int maxArcher = 4;
 	private List<float> archerY = new List<float>();
-	public GameObject[] Archers;
 	public int allyCount;
 	public List<GameObject> AllyList = new List<GameObject>();
 
@@ -77,7 +79,8 @@ public class GameMaster : MonoBehaviour {
 			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Player"));
 			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Ally"));
 		}
-		StartCoroutine (spawnObject ());
+		StartSpawnEnemies ();
+//		SpawnBossWave ();
 	}
 	
 	// Update is called once per frame
@@ -89,6 +92,22 @@ public class GameMaster : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Alpha6)){
 			SpawnArcher ();
 			Debug.Log ("spawning archers");
+		}
+
+		if (Input.GetKeyDown (KeyCode.Alpha4)) {
+			if (spawning) {
+				StopSpawnEnemies ();
+				Debug.Log ("stopping");
+			} else {
+				StartSpawnEnemies ();
+				Debug.Log ("starting");
+			}
+		}
+		if (Input.GetKeyDown (KeyCode.R)) {
+			killAllEnemies ();
+		}
+		if (Input.GetKeyDown (KeyCode.T)) {
+			SpawnBossWave ();
 		}
 	}	
 	//ENEMY SPAWN FUNCTIONS
@@ -113,7 +132,6 @@ public class GameMaster : MonoBehaviour {
 				newEnemy.GetComponent<Enemy_Melee> ().enemy.setIndexLoc (i);
 				warriorCount++;
 				Warriors [i] = newEnemy;
-				enemyCount++;
 				refreshEnemyList ();
 				return;
 			}
@@ -131,33 +149,91 @@ public class GameMaster : MonoBehaviour {
 				newEnemy.GetComponent<Enemy_Ranged> ().enemy.setIndexLoc (i);
 				rifleCount++;
 				Rifles [i] = newEnemy;
+				refreshEnemyList ();
+				return;
+			}
+		}
+	}
+	public void SpawnWarrior(int num){
+		if (warriorCount >= maxWarrior)
+			return;
+		for (int i = 0; i < maxWarrior; i++) {
+			if (Warriors [i] == null) {		
 				enemyCount++;
+				GameObject newEnemy = Instantiate (warriorPrefab,
+					new Vector2 (xStart, yRange[num]), transform.rotation) as GameObject;
+				newEnemy.GetComponent<Enemy_Melee> ().enemy.setIndexLoc (i);
+				warriorCount++;
+				Warriors [i] = newEnemy;
 				refreshEnemyList ();
 				return;
 			}
 		}
 	}
 
-	void SpawnPlatoon(int num){
-		enemyCount += 7;
-		if (num == 0) {
-			for (int i = 0; i < 7; i++) {
-				Instantiate (warriorPrefab, new Vector2 (xStart, yRange [i]), transform.rotation);
-			}
-		}	
-		if (num == 1) {
-			for (int i = 0; i < 7; i++) {
-				Instantiate (riflePrefab, new Vector2 (xStart, yRange [i]), transform.rotation);
+	public void SpawnRifle(int num){
+		if (rifleCount >= maxRifle)
+			return;
+		for (int i = 0; i < maxRifle; i++) {
+			if (Rifles [i] == null) {		
+				enemyCount++;
+				GameObject newEnemy = Instantiate (riflePrefab,
+					new Vector2 (xStart, yRange[num]), transform.rotation) as GameObject;
+				newEnemy.GetComponent<Enemy_Ranged> ().enemy.setIndexLoc (i);
+				rifleCount++;
+				Rifles [i] = newEnemy;
+				refreshEnemyList ();
+				return;
 			}
 		}
-		refreshEnemyList ();
 	}
-		
+
+	public void SpawnWarlord(int num){
+		if (warlordCount >= maxWarlord)
+			return;
+		for (int i = 0; i < maxWarlord; i++) {
+			if (Warlords [i] == null) {		
+				enemyCount++;
+				GameObject newEnemy = Instantiate (warlordPrefab,
+					new Vector2 (xStart, yRange[num]), transform.rotation) as GameObject;
+				newEnemy.GetComponent<Enemy_Melee> ().enemy.setIndexLoc (i);
+				warlordCount++;
+				Warlords [i] = newEnemy;
+				refreshEnemyList ();
+				return;
+			}
+		}
+	}
+
+	public void killAllEnemies(){
+		GameObject[] tempArray = new GameObject[enemyCount];
+		tempArray = GameObject.FindGameObjectsWithTag ("Enemy");
+		for (int i = 0; i < tempArray.Length; i++) {
+			tempArray [i].GetComponent<EnemyClass> ().takeDamage (99999f);
+		}
+	}
+
+
 	/*TIMER FOR SPAWNING ENEMEIS*/
+	public void StartSpawnEnemies(){
+		if(!spawning){
+			spawning = true;
+			StartCoroutine (spawnObject ());
+		}
+	}
+
+	public void StopSpawnEnemies(){
+		if(spawning){
+			spawning = false;
+			StopCoroutine (spawnObject ());
+		}
+	}
+
 	IEnumerator spawnObject()
 	{
 		int num;
-		while (true) {
+		while (spawning == true) {
+			Debug.Log ("spawning");
 			num = Random.Range (0, 2);
 			switch (num) {
 			case(0):
@@ -171,6 +247,35 @@ public class GameMaster : MonoBehaviour {
 			}
 			yield return new WaitForSeconds (1f);
 		}
+	}
+	public void SpawnBossWave(){
+		StopSpawnEnemies ();
+		StartCoroutine(SpawnBossPlatoon());
+	}
+
+	/*TIMER FOR SPAWNING BOSS WAVE*/
+	IEnumerator SpawnBossPlatoon(){
+		
+		StopSpawnEnemies ();
+		killAllEnemies ();
+		yield return new WaitForSeconds (1f);
+		SpawnWarrior (1);
+		SpawnWarrior (2);
+		SpawnWarrior (3);
+		SpawnWarrior (4);
+		SpawnWarrior (5);
+		yield return new WaitForSeconds (1.5f);
+		SpawnWarrior (1);
+		SpawnWarrior (5);
+		SpawnWarlord (3);
+		yield return new WaitForSeconds (1.9f);
+		SpawnRifle (2);
+		SpawnRifle (4);
+		SpawnRifle (0);
+		SpawnRifle (6);
+		yield return new WaitForSeconds (1f);
+		StartSpawnEnemies ();
+
 	}
 
 	//ALLIED SPAWN FUNCTIONS
