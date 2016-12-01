@@ -69,6 +69,7 @@ public class GameMaster : MonoBehaviour {
 		//middle top, middle bottom, top, and bottom position
 		Warriors = new GameObject[maxWarrior];
 		Rifles = new GameObject[maxRifle];
+		Warlords = new GameObject[maxWarlord];
 		Spears = new GameObject[maxSpearman];
 		Archers = new GameObject[maxArcher];
 
@@ -192,6 +193,8 @@ public class GameMaster : MonoBehaviour {
 		if (warlordCount >= maxWarlord)
 			return;
 		for (int i = 0; i < maxWarlord; i++) {
+			Debug.Log ("Entering for loop");
+			Debug.Log ("i = " + i);
 			if (Warlords [i] == null) {		
 				enemyCount++;
 				GameObject newEnemy = Instantiate (warlordPrefab,
@@ -286,6 +289,7 @@ public class GameMaster : MonoBehaviour {
 			if (AllyList [i] == null)
 				AllyList.RemoveAt (i);
 		}
+		AllyList.Add (GameObject.FindGameObjectWithTag ("Player"));
 	}
 
 	public void SpawnArcher(){
