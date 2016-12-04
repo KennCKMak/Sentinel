@@ -32,6 +32,7 @@ public class EnemyClass : MonoBehaviour {
 	public enum unitTypes{
 		RIFLE,
 		WARRIOR,
+		SHOTGUNNER,
 		WARLORD
 	};
 	public unitTypes myClass;
@@ -90,16 +91,24 @@ public class EnemyClass : MonoBehaviour {
 		if (myClass == unitTypes.RIFLE){
 			gameMaster.rifleCount--;
 			gameMaster.Rifles [indexLoc] = null; //setting its position in the allyarray to null
-			numberMaster.score += 5;
+			numberMaster.addGold(20);
+			numberMaster.addScore (5);
 		} else if (myClass == unitTypes.WARRIOR){
 			gameMaster.warriorCount--;
 			gameMaster.Warriors [indexLoc] = null; //setting its position in the allyarray to null
-			numberMaster.score += 2;
+			numberMaster.addGold(35);
+			numberMaster.addScore (2);
+		} else if (myClass == unitTypes.SHOTGUNNER){
+			gameMaster.shotgunnerCount--;
+			gameMaster.Shotgunners [indexLoc] = null; //setting its position in the allyarray to null
+			numberMaster.addGold(75);
+			numberMaster.addScore (25);
 		} else if (myClass == unitTypes.WARLORD){
-		gameMaster.warlordCount--;
-		gameMaster.Warlords [indexLoc] = null; //setting its position in the allyarray to null
-		numberMaster.score += 10;
-	} 
+			gameMaster.warlordCount--;
+			gameMaster.Warlords [indexLoc] = null; //setting its position in the allyarray to null
+			numberMaster.addGold(150);
+			numberMaster.addScore (100);
+		} 
 	}
 
 

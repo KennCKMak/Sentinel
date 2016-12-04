@@ -25,11 +25,17 @@ public class GameMaster : MonoBehaviour {
 	public int warriorCount = 0;
 	public int maxWarrior = 7;
 
+	//enemy shotgunner counter
+	public GameObject[] Shotgunners;
+	public GameObject shotgunnerPrefab;
+	public int shotgunnerCount = 0;
+	public int maxShotgunner = 2;
+
 	//enemy warlord counter
 	public GameObject[] Warlords;
 	public GameObject warlordPrefab;
 	public int warlordCount = 0;
-	public int maxWarlord = 7;
+	public int maxWarlord = 1;
 
 	public int enemyCount;
 	public List<GameObject> EnemyList = new List<GameObject> ();
@@ -40,7 +46,7 @@ public class GameMaster : MonoBehaviour {
 	public GameObject spearmanPrefab;
 	private float spearmanX = 6.9511f;
 	public int spearmanCount = 0;
-	private int maxSpearman = 7;
+	public int maxSpearman = 7;
 	private List<float> spearmanY = new List<float> (); //0.13f;
 
 	//allied archer counter
@@ -48,7 +54,7 @@ public class GameMaster : MonoBehaviour {
 	public GameObject archerPrefab;
 	private float archerX = 8.73f;
 	public int archerCount = 0;
-	private int maxArcher = 4;
+	public int maxArcher = 4;
 	private List<float> archerY = new List<float>();
 	public int allyCount;
 	public List<GameObject> AllyList = new List<GameObject>();
@@ -69,6 +75,7 @@ public class GameMaster : MonoBehaviour {
 		//middle top, middle bottom, top, and bottom position
 		Warriors = new GameObject[maxWarrior];
 		Rifles = new GameObject[maxRifle];
+		Shotgunners = new GameObject[maxShotgunner];
 		Warlords = new GameObject[maxWarlord];
 		Spears = new GameObject[maxSpearman];
 		Archers = new GameObject[maxArcher];
@@ -81,6 +88,7 @@ public class GameMaster : MonoBehaviour {
 			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Ally"));
 		}
 		StartSpawnEnemies ();
+		StartCoroutine(SpawnShotgun ());
 //		SpawnBossWave ();
 	}
 	
@@ -155,6 +163,24 @@ public class GameMaster : MonoBehaviour {
 			}
 		}
 	}
+
+	public void SpawnShotgunner(){
+		if (shotgunnerCount >= maxShotgunner)
+			return;
+		for (int i = 0; i < maxShotgunner; i++) {
+			if (Shotgunners [i] == null) {		
+				enemyCount++;
+				GameObject newEnemy = Instantiate (shotgunnerPrefab,
+					new Vector2 (xStart, yRange [Random.Range (0, yRange.Count)]), transform.rotation) as GameObject;
+				newEnemy.GetComponent<Enemy_Shotgun> ().enemy.setIndexLoc (i);
+				shotgunnerCount++;
+				Shotgunners [i] = newEnemy;
+				refreshEnemyList ();
+				return;
+			}
+		}
+	}
+
 	public void SpawnWarrior(int num){
 		if (warriorCount >= maxWarrior)
 			return;
@@ -193,8 +219,6 @@ public class GameMaster : MonoBehaviour {
 		if (warlordCount >= maxWarlord)
 			return;
 		for (int i = 0; i < maxWarlord; i++) {
-			Debug.Log ("Entering for loop");
-			Debug.Log ("i = " + i);
 			if (Warlords [i] == null) {		
 				enemyCount++;
 				GameObject newEnemy = Instantiate (warlordPrefab,
@@ -236,10 +260,10 @@ public class GameMaster : MonoBehaviour {
 	{
 		int num;
 		while (spawning == true) {
-			Debug.Log ("spawning");
 			num = Random.Range (0, 2);
 			switch (num) {
 			case(0):
+				//SpawnShotgunner ();
 				SpawnWarrior ();
 				break;
 			case(1):
@@ -251,6 +275,12 @@ public class GameMaster : MonoBehaviour {
 			yield return new WaitForSeconds (1f);
 		}
 	}
+
+	IEnumerator SpawnShotgun(){
+		SpawnShotgunner ();
+		yield return new WaitForSeconds (30f);
+	}
+
 	public void SpawnBossWave(){
 		StopSpawnEnemies ();
 		StartCoroutine(SpawnBossPlatoon());

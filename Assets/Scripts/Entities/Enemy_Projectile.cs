@@ -10,6 +10,7 @@ public class Enemy_Projectile : MonoBehaviour {
 	private Rigidbody2D rb;
 	// Use this for initialization
 	void Start () {
+		Destroy (gameObject, 3f);
 		/*dir.Normalize();
 		rb = transform.GetComponent<Rigidbody2D> ();
 		rb.velocity = dir * speed*100 * Time.deltaTime;
