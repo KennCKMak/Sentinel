@@ -3,32 +3,42 @@ using System.Collections;
 
 public class ButtonMaster : MonoBehaviour {
 
-	private GameMaster gameMaster;
 	private NumberMaster numberMaster;
-	private CanvasScript canvasScript;
+	private Player player;
 	// Use this for initialization
 	void Start () {
-		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
 		numberMaster = GameObject.Find ("GameMaster").GetComponent<NumberMaster> ();
-		canvasScript = GameObject.Find ("Canvas").GetComponent<CanvasScript> ();
-	
+		player = GameObject.FindGameObjectWithTag ("Player").GetComponent<Player> ();
 	}
 
-
-	void UpgradeScatter () {
-		numberMaster.UpgradeScatter ();
+	public void BuySpearman(){
+		if (player.isAlive ())
+			numberMaster.BuySpearman ();
 	}
 
-	void UpgradePunchthrough () {
-		numberMaster.UpgradePunchthrough ();
+	public void BuyArcher(){
+		if (player.isAlive ())
+			numberMaster.BuyArcher ();
 	}
 
-	void UpgradeDamage () {
-		numberMaster.UpgradeDamage ();
+	public void UpgradeScatter () {
+		if (player.isAlive ())
+			numberMaster.UpgradeScatter ();
+	}
+
+	public void UpgradePunchthrough () {
+		if (player.isAlive ())
+			numberMaster.UpgradePunchthrough ();
+	}
+
+	public void UpgradeDamage () {
+		if (player.isAlive ())
+			numberMaster.UpgradeDamage ();
 
 	}
 
-	void UpgradeArmour () {
-		numberMaster.UpgradeArmour ();
+	public void UpgradeArmour () {
+		if (player.isAlive ())
+			numberMaster.UpgradeArmour ();
 	}
 }

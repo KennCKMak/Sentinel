@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class Player : MonoBehaviour {
 
-	private GameMaster gameMaster;
 	private NumberMaster numberMaster;
+	private GameMaster gameMaster;
 
 	public GameObject arrowTip;
 	public GameObject arrowBase;
@@ -14,8 +15,15 @@ public class Player : MonoBehaviour {
 
 	public float health;
 	public float maxHealth;
-	public float reloadTime;
 	public float wpnDmg;
+
+	public float bowCounter;
+	public float bowReload = 0.3f;
+	public float scatterCounter;
+	public float scatterReload = 1.0f;
+	public float ballistaCounter;
+	public float ballistaReload = 5.0f;
+
 
 	private int weapon = 1;
 	//this is the angle for firing...
@@ -24,7 +32,7 @@ public class Player : MonoBehaviour {
 
 	protected GameObject HealthBar; //access to the health bar
 	protected GameObject HPImg;
-	protected float leftMost = -109.7f;
+	protected float leftMost;
 
 	private GameObject canvas;
 	private CanvasScript canvasScript;
@@ -44,6 +52,9 @@ public class Player : MonoBehaviour {
 		updateHP ();
 
 		StartCoroutine (LateStart (0.1f));
+		bowCounter = bowReload;
+		scatterCounter = scatterReload;
+		ballistaCounter = ballistaReload;
 	}
 
 	IEnumerator LateStart(float num){
@@ -54,10 +65,37 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update() {
+		if (bowCounter < bowReload)
+			bowCounter += Time.deltaTime;
+		if (scatterCounter < scatterReload)
+			scatterCounter += Time.deltaTime;
+		if (ballistaCounter < ballistaReload)
+			ballistaCounter += Time.deltaTime;
 		//rotating to mouse location
-		Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
-		float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg; 
-		transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		if (mousePos.y > -3.215f && mousePos.y < 4.19f) {
+			Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint (transform.position);
+			float angle = Mathf.Atan2 (dir.y, dir.x) * Mathf.Rad2Deg; 
+			transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
+			//shooting
+			if(Input.GetMouseButtonDown(0)) {
+				switch (weapon) {
+				case(1):
+					FireArrow ();
+					break;
+				case(2):
+					FireScatterArrow (retScatterLevel()+1);
+					break;
+				case(3):
+					FireBallista ();
+					break;
+				default:
+					break;
+				}
+			}
+		} else {
+			transform.rotation = Quaternion.Lerp (transform.rotation, new Quaternion(0, 0, 180, 1), 0.1f*Time.deltaTime);
+		}
 
 
 
@@ -69,39 +107,26 @@ public class Player : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Alpha3))
 			WeaponSelect (3);
 
-		//shooting
-		if(Input.GetMouseButtonDown(0)) {
-			switch (weapon) {
-			case(1):
-				FireArrow ();
-				break;
-			case(2):
-				FireScatterArrow (retScatterLevel()+2);
-				break;
-			case(3):
-				Debug.Log ("Firing Ballista");
-				FireBallista ();
-				break;
-			default:
-				break;
-			}
-		}
+
 		updateHP ();
 	}
 
 	void FireArrow(){
-		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
-		mousePosition.z = 0;
+		if (bowCounter >= bowReload) {
+			bowCounter = 0;
+			Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
+			mousePosition.z = 0;
 
-		Quaternion rot = Quaternion.LookRotation(arrowBase.transform.position - mousePosition, Vector3.forward);
-		GameObject newArrow = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
-		newArrow.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z-89.1f);
+			Quaternion rot = Quaternion.LookRotation (arrowBase.transform.position - mousePosition, Vector3.forward);
+			GameObject newArrow = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
+			newArrow.transform.eulerAngles = new Vector3 (0, 0, transform.eulerAngles.z - 89.1f);
 
-		newArrow.tag = "Player_Projectile";
-		newArrow.GetComponent<Player_Projectile> ();
-		newArrow.GetComponent<Player_Projectile> ().speed = 10f;
-		newArrow.GetComponent<Player_Projectile> ().punchthrough = retPunchthroughLevel ();
-		newArrow.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg + wpnDmg * retDamageLevel() * 0.5f;
+			newArrow.tag = "Player_Projectile";
+			newArrow.GetComponent<Player_Projectile> ();
+			newArrow.GetComponent<Player_Projectile> ().speed = 10f;
+			newArrow.GetComponent<Player_Projectile> ().punchthrough = retPunchthroughLevel ();
+			newArrow.GetComponent<Player_Projectile> ().wpnDmg = wpnDmg + wpnDmg * retDamageLevel () * 0.5f;
+		}
 	}
 
 	void FireArrow(float angle){ //this is used to offset things
@@ -120,41 +145,50 @@ public class Player : MonoBehaviour {
 	}
 
 	void FireScatterArrow(int num){
-		float tempAngle = angle - (0.15f * (retScatterLevel()+1));
-		if (num == 0)
-			FireArrow ();
-		else {
-			if (num % 2 == 0) {//even number of arrows 
-				for (int i = 0; i < num; i++) {
-					i++;
-					FireArrow (tempAngle + i * tempAngle - tempAngle/1.5f);
-					FireArrow (-tempAngle - i * tempAngle + tempAngle/1.5f);
-				}
-			} else { //odd number of arrows
-				FireArrow(); //fires a straight arrow
-				num--;// we fired one
-				for (int i = 0; i < num; i++) {
-					i++; //we fired twice, once in for and once here
-					FireArrow (tempAngle + i * tempAngle); //fires one arrow angled up
-					FireArrow (-tempAngle - i * tempAngle); //fires one arrow angled down
+		if (scatterCounter >= scatterReload) {
+			scatterCounter = 0;
+			float tempAngle = angle - (0.15f * (retScatterLevel () + 1));
+			if (num == 0)
+				FireArrow ();
+			else {
+				if (num % 2 == 0) {//even number of arrows 
+					for (int i = 0; i < num; i++) {
+						i++;
+						FireArrow (tempAngle / 2 + i * tempAngle);
+						FireArrow (-tempAngle / 2 - i * tempAngle);
+						//FireArrow (tempAngle + i * tempAngle - tempAngle/1.5f);
+						//FireArrow (-tempAngle - i * tempAngle + tempAngle/1.5f);
+					}
+				} else { //odd number of arrows
+					FireArrow (0); //fires a straight arrow
+					num--;// we fired one
+					for (int i = 0; i < num; i++) {
+						i++; //we fired twice, once in for and once here
+						FireArrow (tempAngle + i * tempAngle); //fires one arrow angled up
+						FireArrow (-tempAngle - i * tempAngle); //fires one arrow angled down
+					}
 				}
 			}
 		}
 	}
-	void FireBallista(){ //massive punchthrough, increased size, damage x10
-		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
-		mousePosition.z = 0;
-		Quaternion rot = Quaternion.LookRotation(arrowBase.transform.position - mousePosition, Vector3.forward);
-		GameObject newArrow = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
-		newArrow.transform.eulerAngles = new Vector3(0, 0, transform.eulerAngles.z-89.1f);
-		newArrow.tag = "Player_Projectile";
 
-		newArrow.GetComponent<Player_Projectile> ().speed = 7f;
-		newArrow.GetComponent<Player_Projectile> ().punchthrough = retPunchthroughLevel () + 10;
-		newArrow.GetComponent<Player_Projectile> ().wpnDmg = (wpnDmg + wpnDmg * retDamageLevel() * 0.5f)*10;
-		Vector2 newSize = new Vector2 (newArrow.transform.localScale.x, newArrow.transform.localScale.y);
-		newSize *= 3;
-		newArrow.transform.localScale = newSize;
+	void FireBallista(){ //massive punchthrough, increased size, damage x10
+		if (ballistaCounter >= ballistaReload) {
+			ballistaCounter = 0;
+			Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
+			mousePosition.z = 0;
+			Quaternion rot = Quaternion.LookRotation (arrowBase.transform.position - mousePosition, Vector3.forward);
+			GameObject newArrow = Instantiate (arrow, arrowBase.transform.position, rot) as GameObject;
+			newArrow.transform.eulerAngles = new Vector3 (0, 0, transform.eulerAngles.z - 89.1f);
+			newArrow.tag = "Player_Projectile";
+
+			newArrow.GetComponent<Player_Projectile> ().speed = 7f;
+			newArrow.GetComponent<Player_Projectile> ().punchthrough = retPunchthroughLevel () + 10;
+			newArrow.GetComponent<Player_Projectile> ().wpnDmg = (wpnDmg + wpnDmg * retDamageLevel () * 0.5f) * 10;
+			Vector2 newSize = new Vector2 (newArrow.transform.localScale.x, newArrow.transform.localScale.y);
+			newSize *= 3;
+			newArrow.transform.localScale = newSize;
+		}
 	}
 
 	void OnTriggerEnter2D(Collider2D col){
@@ -188,9 +222,17 @@ public class Player : MonoBehaviour {
 		if (health <= 0 && alive) {
 			alive = !alive;
 			GetComponent<CircleCollider2D> ().enabled = false;
-			Destroy (HPImg);
-			Destroy (gameObject, 1f);
+			gameMaster.refreshAllyList ();
+			transform.tag = "Untagged";
+			StartCoroutine (LoseGame ());
 		}
+	}
+
+	IEnumerator LoseGame(){
+		yield return new WaitForSeconds (2f);
+		GameObject.Find ("Canvas").transform.FindChild ("DefeatScreen").gameObject.SetActive (true);
+		yield return new WaitForSeconds (6f);
+		SceneManager.LoadScene (1);
 	}
 	//getting upgrades from main
 	int retScatterLevel(){

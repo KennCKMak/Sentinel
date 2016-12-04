@@ -6,7 +6,7 @@ public class GameMaster : MonoBehaviour {
 
 	public bool debugMode = true;
 	public float timeScale;
-
+	public NumberMaster numberMaster;
 
 
 	//enemies...
@@ -31,6 +31,9 @@ public class GameMaster : MonoBehaviour {
 	public int shotgunnerCount = 0;
 	public int maxShotgunner = 2;
 
+
+	//
+	public int enemyToBoss = 50;
 	//enemy warlord counter
 	public GameObject[] Warlords;
 	public GameObject warlordPrefab;
@@ -63,7 +66,7 @@ public class GameMaster : MonoBehaviour {
 	void Start () {
 		if(debugMode)
 			Time.timeScale = timeScale;
-
+		numberMaster = transform.GetComponent<NumberMaster> ();
 		for (int i = 0; i < 7; i++) { //setting up the 7 grids
 			yRange.Add(-2.62f + i * 1); //setting up grid yaxis
 		}
@@ -88,35 +91,42 @@ public class GameMaster : MonoBehaviour {
 			AllyList.AddRange (GameObject.FindGameObjectsWithTag ("Ally"));
 		}
 		StartSpawnEnemies ();
-		StartCoroutine(SpawnShotgun ());
+		StartCoroutine(spawnShotgun ());
 //		SpawnBossWave ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown (KeyCode.Alpha5)) {
-			SpawnSpearman ();
-			Debug.Log ("spawning spears");
-		}
-		if (Input.GetKeyDown (KeyCode.Alpha6)){
-			SpawnArcher ();
-			Debug.Log ("spawning archers");
+		if (numberMaster.enemiesKilled >= enemyToBoss) {
+			enemyToBoss += enemyToBoss;
+			SpawnBossWave ();
 		}
 
-		if (Input.GetKeyDown (KeyCode.Alpha4)) {
-			if (spawning) {
-				StopSpawnEnemies ();
-				Debug.Log ("stopping");
-			} else {
-				StartSpawnEnemies ();
-				Debug.Log ("starting");
+		if (debugMode) { //these are hotkeys for debug mode.
+			if (Input.GetKeyDown (KeyCode.Alpha5)) {
+				SpawnSpearman ();
+				Debug.Log ("spawning spears");
 			}
-		}
-		if (Input.GetKeyDown (KeyCode.R)) {
-			killAllEnemies ();
-		}
-		if (Input.GetKeyDown (KeyCode.T)) {
-			SpawnBossWave ();
+			if (Input.GetKeyDown (KeyCode.Alpha6)) {
+				SpawnArcher ();
+				Debug.Log ("spawning archers");
+			}
+
+			if (Input.GetKeyDown (KeyCode.Alpha4)) {
+				if (spawning) {
+					StopSpawnEnemies ();
+					Debug.Log ("stopping");
+				} else {
+					StartSpawnEnemies ();
+					Debug.Log ("starting");
+				}
+			}
+			if (Input.GetKeyDown (KeyCode.R)) {
+				killAllEnemies ();
+			}
+			if (Input.GetKeyDown (KeyCode.T)) {
+				SpawnBossWave ();
+			}
 		}
 	}	
 	//ENEMY SPAWN FUNCTIONS
@@ -243,20 +253,18 @@ public class GameMaster : MonoBehaviour {
 
 	/*TIMER FOR SPAWNING ENEMEIS*/
 	public void StartSpawnEnemies(){
-		if(!spawning){
 			spawning = true;
-			StartCoroutine (spawnObject ());
-		}
+			StartCoroutine (spawnTroops ());
+			StartCoroutine (spawnShotgun ());
 	}
 
 	public void StopSpawnEnemies(){
-		if(spawning){
 			spawning = false;
-			StopCoroutine (spawnObject ());
-		}
+			StopCoroutine (spawnTroops ());
+			StartCoroutine (spawnShotgun ());
 	}
 
-	IEnumerator spawnObject()
+	IEnumerator spawnTroops()
 	{
 		int num;
 		while (spawning == true) {
@@ -272,13 +280,13 @@ public class GameMaster : MonoBehaviour {
 			default:
 				break;
 			}
-			yield return new WaitForSeconds (1f);
+			yield return new WaitForSeconds (2f);
 		}
 	}
 
-	IEnumerator SpawnShotgun(){
-		SpawnShotgunner ();
+	IEnumerator spawnShotgun(){
 		yield return new WaitForSeconds (30f);
+		SpawnShotgunner ();
 	}
 
 	public void SpawnBossWave(){
@@ -288,7 +296,6 @@ public class GameMaster : MonoBehaviour {
 
 	/*TIMER FOR SPAWNING BOSS WAVE*/
 	IEnumerator SpawnBossPlatoon(){
-		
 		StopSpawnEnemies ();
 		killAllEnemies ();
 		yield return new WaitForSeconds (1f);
@@ -306,7 +313,7 @@ public class GameMaster : MonoBehaviour {
 		SpawnRifle (4);
 		SpawnRifle (0);
 		SpawnRifle (6);
-		yield return new WaitForSeconds (1f);
+		yield return new WaitForSeconds (30f);
 		StartSpawnEnemies ();
 
 	}
@@ -319,7 +326,8 @@ public class GameMaster : MonoBehaviour {
 			if (AllyList [i] == null)
 				AllyList.RemoveAt (i);
 		}
-		AllyList.Add (GameObject.FindGameObjectWithTag ("Player"));
+		if (GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().isAlive())
+			AllyList.Add (GameObject.FindGameObjectWithTag ("Player"));
 	}
 
 	public void SpawnArcher(){

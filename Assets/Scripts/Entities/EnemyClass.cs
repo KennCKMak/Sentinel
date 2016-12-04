@@ -91,12 +91,12 @@ public class EnemyClass : MonoBehaviour {
 		if (myClass == unitTypes.RIFLE){
 			gameMaster.rifleCount--;
 			gameMaster.Rifles [indexLoc] = null; //setting its position in the allyarray to null
-			numberMaster.addGold(20);
+			numberMaster.addGold(35);
 			numberMaster.addScore (5);
 		} else if (myClass == unitTypes.WARRIOR){
 			gameMaster.warriorCount--;
 			gameMaster.Warriors [indexLoc] = null; //setting its position in the allyarray to null
-			numberMaster.addGold(35);
+			numberMaster.addGold(20);
 			numberMaster.addScore (2);
 		} else if (myClass == unitTypes.SHOTGUNNER){
 			gameMaster.shotgunnerCount--;
@@ -108,6 +108,7 @@ public class EnemyClass : MonoBehaviour {
 			gameMaster.Warlords [indexLoc] = null; //setting its position in the allyarray to null
 			numberMaster.addGold(150);
 			numberMaster.addScore (100);
+			gameMaster.StartSpawnEnemies ();
 		} 
 	}
 

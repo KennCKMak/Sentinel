@@ -113,7 +113,7 @@ public class Enemy_Shotgun : MonoBehaviour {
 				waypoint = checkForNewWP (waypoint);
 			} else { //not at location
 				enemy.rotateToTarget (waypoint.transform.position, transform.position);
-				Walk ();
+				WalkIncr ();
 			}
 		}
 	}
@@ -128,6 +128,10 @@ public class Enemy_Shotgun : MonoBehaviour {
 
 	void Walk (){
 		rb.velocity = (transform.right * enemy.speed * Time.deltaTime);
+	}
+
+	void WalkIncr(){
+		rb.velocity = (transform.right * enemy.speed *1.2f * Time.deltaTime);
 	}
 
 	void OnTriggerEnter2D(Collider2D col){

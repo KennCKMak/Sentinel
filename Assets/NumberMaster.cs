@@ -48,21 +48,31 @@ public class NumberMaster : MonoBehaviour {
 
 	public void addGold(int num){
 		gold += num;
-		canvasScript.updateAbilities ();
+		canvasScript.updateAll ();
 
 	}
 
 	public void subGold(int num){
 		gold -= num;
-		canvasScript.updateAbilities ();
+		canvasScript.updateAll ();
 	}
 
 	public void addScore(int num){
 		score += num;
+		canvasScript.updateAll ();
+	}
+
+	public int returnScore(){
+		return score;
 	}
 
 	public void incEnemyKilled(int num){
+		enemiesKilled += num;;
+		canvasScript.updateAll ();
+	}
 
+	public int returnEnemiesKilled(){
+		return enemiesKilled;
 	}
 
 
@@ -143,26 +153,30 @@ public class NumberMaster : MonoBehaviour {
 		if (canUpgradeScatter ()) {
 			subGold (baseUpgradeCost + (scaleUpgradeLevel * scatterLevel));
 			scatterLevel++;
+			canvasScript.updateAll ();
 		}
 	}
 	public void UpgradePunchthrough(){
 		if (canUpgradePunchthrough ()) {
 			subGold (baseUpgradeCost + (scaleUpgradeLevel * punchthroughLevel));
-			scatterLevel++;
+			punchthroughLevel++;
+			canvasScript.updateAll ();
 		}
 
 	}
 	public void UpgradeDamage(){
 		if (canUpgradeDamage ()) {
 			subGold (baseUpgradeCost + (scaleUpgradeLevel * damageLevel));
-			scatterLevel++;
+			damageLevel++;
+			canvasScript.updateAll ();
 		}
 
 	}
 	public void UpgradeArmour(){
 		if (canUpgradeArmour ()) {
 			subGold (baseUpgradeCost + (scaleUpgradeLevel * armourLevel));
-			scatterLevel++;
+			armourLevel++;
+			canvasScript.updateAll ();
 		}
 
 	}
