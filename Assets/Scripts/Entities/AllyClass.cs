@@ -5,6 +5,7 @@ public class AllyClass : MonoBehaviour {
 
 	protected GameMaster gameMaster;
 	protected NumberMaster numberMaster;
+	protected CanvasScript canvasScript;
 
 	public float health;
 	public float maxHealth;
@@ -41,6 +42,7 @@ public class AllyClass : MonoBehaviour {
 	void Start(){
 		gameMaster = GameObject.Find ("GameMaster").GetComponent<GameMaster> ();
 		numberMaster = GameObject.Find ("GameMaster").GetComponent<NumberMaster> ();
+		canvasScript = GameObject.Find ("Canvas").GetComponent<CanvasScript> ();
 		alive = true;
 		health = maxHealth;
 		createHealthBar ();
@@ -81,6 +83,7 @@ public class AllyClass : MonoBehaviour {
 			transform.tag = "Untagged";
 			gameMaster.refreshAllyList ();
 			gameMaster.allyCount--;
+			canvasScript.updateAll ();
 			Die2 ();
 			Destroy (gameObject, 1f);
 		}

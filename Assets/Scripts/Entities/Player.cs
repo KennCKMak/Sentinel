@@ -65,6 +65,10 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update() {
+		if (health < maxHealth)
+			health += Time.deltaTime;
+		else
+			health = maxHealth;
 		if (bowCounter < bowReload)
 			bowCounter += Time.deltaTime;
 		if (scatterCounter < scatterReload)
@@ -73,12 +77,12 @@ public class Player : MonoBehaviour {
 			ballistaCounter += Time.deltaTime;
 		//rotating to mouse location
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		if (mousePos.y > -3.215f && mousePos.y < 4.19f) {
+		if (mousePos.y > -5.59f && mousePos.y < 6.38f && isAlive() && !gameMaster.paused) {
 			Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint (transform.position);
 			float angle = Mathf.Atan2 (dir.y, dir.x) * Mathf.Rad2Deg; 
 			transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
 			//shooting
-			if(Input.GetMouseButtonDown(0)) {
+			if(Input.GetMouseButton(0)) {
 				switch (weapon) {
 				case(1):
 					FireArrow ();
@@ -232,7 +236,7 @@ public class Player : MonoBehaviour {
 		yield return new WaitForSeconds (2f);
 		GameObject.Find ("Canvas").transform.FindChild ("DefeatScreen").gameObject.SetActive (true);
 		yield return new WaitForSeconds (6f);
-		SceneManager.LoadScene (1);
+		SceneManager.LoadScene ("Menu");
 	}
 	//getting upgrades from main
 	int retScatterLevel(){

@@ -45,9 +45,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ButtonMaster.cs" />
-     <Compile Include="Assets\CanvasScript.cs" />
-     <Compile Include="Assets\NumberMaster.cs" />
      <Compile Include="Assets\Scripts\BorderScript.cs" />
      <Compile Include="Assets\Scripts\Entities\AllyClass.cs" />
      <Compile Include="Assets\Scripts\Entities\Ally_Melee.cs" />
@@ -59,8 +56,12 @@
      <Compile Include="Assets\Scripts\Entities\Enemy_Shotgun.cs" />
      <Compile Include="Assets\Scripts\Entities\Player.cs" />
      <Compile Include="Assets\Scripts\Entities\Player_Projectile.cs" />
-     <Compile Include="Assets\Scripts\GameMaster.cs" />
-     <Compile Include="Assets\Scripts\debugDetect.cs" />
+     <Compile Include="Assets\Scripts\InstructionScript.cs" />
+     <Compile Include="Assets\Scripts\MasterScripts\ButtonMaster.cs" />
+     <Compile Include="Assets\Scripts\MasterScripts\CanvasScript.cs" />
+     <Compile Include="Assets\Scripts\MasterScripts\GameMaster.cs" />
+     <Compile Include="Assets\Scripts\MasterScripts\NumberMaster.cs" />
+     <Compile Include="Assets\Scripts\MasterScripts\debugDetect.cs" />
      <Compile Include="Assets\Scripts\healthBarTarget.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>G:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
